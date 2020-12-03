@@ -21,6 +21,14 @@ def build_lines_coords(puzzle_input):
     points_count = collections.defaultdict(
         lambda: collections.defaultdict(list))
 
+    # points_count = {
+    #     (x, y): {
+    #         'lines': [0, 1],
+    #         'distance': [321, 765]
+    #     },
+    #     ...
+    # }
+
     for line_id in range(len(puzzle_input)):
         pointer = [0, 0]
         steps = 0
