@@ -18,30 +18,40 @@ def format_input_data(puzzle_input_str):
 
 
 def build_lines_coords(puzzle_input):
-    points_count = collections.defaultdict(list)
+    points_count = collections.defaultdict(
+        lambda: collections.defaultdict(list))
 
     for line_id in range(len(puzzle_input)):
         pointer = [0, 0]
+        steps = 0
         for move in puzzle_input[line_id]:
             if move[0] == 'U':
                 for _ in range(move[1]):
+                    steps += 1
                     pointer[1] += 1
-                    points_count[tuple(pointer)].append(line_id)
+                    points_count[tuple(pointer)]['lines'].append(line_id)
+                    points_count[tuple(pointer)]['distance'].append(steps)
 
             elif move[0] == 'D':
                 for _ in range(move[1]):
+                    steps += 1
                     pointer[1] -= 1
-                    points_count[tuple(pointer)].append(line_id)
+                    points_count[tuple(pointer)]['lines'].append(line_id)
+                    points_count[tuple(pointer)]['distance'].append(steps)
 
             elif move[0] == 'R':
                 for _ in range(move[1]):
+                    steps += 1
                     pointer[0] += 1
-                    points_count[tuple(pointer)].append(line_id)
+                    points_count[tuple(pointer)]['lines'].append(line_id)
+                    points_count[tuple(pointer)]['distance'].append(steps)
 
             elif move[0] == 'L':
                 for _ in range(move[1]):
+                    steps += 1
                     pointer[0] -= 1
-                    points_count[tuple(pointer)].append(line_id)
+                    points_count[tuple(pointer)]['lines'].append(line_id)
+                    points_count[tuple(pointer)]['distance'].append(steps)
 
     return points_count
 
@@ -56,11 +66,26 @@ def part_1(puzzle_input):
 
     intersections = []
     for key, value in points_coords.items():
-        if len(set(value)) == 2:
+        if len(set(value['lines'])) == 2:
             intersections.append(key)
 
     distances = [manhattan_distance((0, 0), point) for point in intersections]
+
     return min(distances)
 
 
+def part_2(puzzle_input):
+    puzzle_input = format_input_data(puzzle_input)
+    points_coords = build_lines_coords(puzzle_input)
+
+    intersections = []
+    for key, value in points_coords.items():
+        if len(set(value['lines'])) == 2:
+            intersections.append(key)
+
+    steps = [sum(points_coords[point]['distance']) for point in intersections]
+    return min(steps)
+
+
 print(part_1(puzzle_input_str))
+print(part_2(puzzle_input_str))
