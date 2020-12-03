@@ -39,6 +39,7 @@ def first_common_object(space_obj_1, space_obj_2):
 
 
 def distance_between_objects(to_object, from_object):
+    # to_object has to be on path of from_object
     counter = 0
     path = from_object.path_to_root()[:-1]
 
