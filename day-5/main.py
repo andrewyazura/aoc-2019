@@ -1,5 +1,3 @@
-import itertools
-
 puzzle_input = []
 
 with open('day-5/input.txt', 'r') as file:
@@ -9,6 +7,8 @@ with open('day-5/input.txt', 'r') as file:
 class IntcodeInterpreter:
     def __init__(self, memory):
         self.memory = memory
+        self.preset_input = []
+        self.saved_output = []
         self.pointer = 0
         self.opcodes = {
             1: {
@@ -45,6 +45,9 @@ class IntcodeInterpreter:
             },
         }
 
+    def provide_input(self, *args):
+        self.preset_input.extend(args)
+
     def interpret_instruction(self, instruction):
         instruction = str(instruction).rjust(5, ' ')
         opcode = int(instruction[3:])
@@ -61,7 +64,8 @@ class IntcodeInterpreter:
         return self.memory[addr3]
 
     def input(self, addr):
-        self.memory[addr] = self._input()
+        self.memory[addr] = self.preset_input.pop(0) \
+            if self.preset_input else self._input()
         return self.memory[addr]
 
     def _input(self):
@@ -76,8 +80,9 @@ class IntcodeInterpreter:
         return answer
 
     def output(self, addr):
-        print(self.memory[addr])
-        return self.memory[addr]
+        r = self.memory[addr]
+        self.saved_output.append(r)
+        return r
 
     def jump_if_true(self, addr1, addr2):
         if self.memory[addr1] != 0:
@@ -111,7 +116,7 @@ class IntcodeInterpreter:
             )
 
             if opcode == 99:
-                return self.memory
+                return self.memory, self.saved_output
 
             opcode_func = self.opcodes[opcode]['func']
             opcode_shift = self.opcodes[opcode]['shift']
@@ -128,9 +133,19 @@ class IntcodeInterpreter:
             self.pointer += opcode_shift if result is not None else 0
 
 
-puzzle = puzzle_input.copy()
-interpreter = IntcodeInterpreter(puzzle)
-interpreter.execute()
+def part_1(puzzle_input):
+    puzzle = puzzle_input.copy()
+    interpreter = IntcodeInterpreter(puzzle)
+    interpreter.provide_input(1)
+    return interpreter.execute()[1][-1]
 
-# provide 1 for part 1
-# provide 5 for part 2
+
+def part_2(puzzle_input):
+    puzzle = puzzle_input.copy()
+    interpreter = IntcodeInterpreter(puzzle)
+    interpreter.provide_input(5)
+    return interpreter.execute()[1][-1]
+
+
+print(part_1(puzzle_input))
+print(part_2(puzzle_input))
